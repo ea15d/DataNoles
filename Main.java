@@ -7,7 +7,7 @@ class Main {
 	
 	static int SS_BEG = 2;
 	static int SS_END = 500;
-	static double c1 = 25;//3.53; //27
+	static double c1 = 22;//3.53; //27 or 23/24
 	static double c2 = 0.075;//.001 //025
 
 	
@@ -30,6 +30,22 @@ class Main {
 			String view_query;
 			ResultSet rs;
 			System.out.println("Printing Top 20!");
+			
+			/*
+			
+			EXAMPLE OF: using id-ordered index on random set-defined selection w/ cardinality = 2
+			
+				# define set-defined selection through virtual table (view)
+				CREATE OR REPLACE VIEW tmp AS SELECT * FROM songs_id_index order by rand() LIMIT 2;
+				
+				# process top-K query with set-defined selection
+				SELECT SongNumber, SongID, Duration, Title FROM songs_id_index FORCE INDEX(idx_songs_id_index_SongNumber) 
+				WHERE SongNumber IN (SELECT SongNumber FROM dataset.tmp) 
+				ORDER BY Duration LIMIT 20;
+				
+			*/
+
+
 			for (int setSize = SS_BEG; setSize <= SS_END; setSize++) {
 				
 				String table_var = get_table(setSize);
@@ -45,8 +61,8 @@ class Main {
 				
 				if (table_var.compareTo("songs_id_index") == 0)
 					{st.executeQuery("SELECT SongNumber, SongID, Duration, Title FROM songs_id_index FORCE INDEX(idx_songs_id_index_SongNumber) WHERE SongNumber IN (SELECT SongNumber FROM dataset.tmp) ORDER BY Duration LIMIT 20;");}
-				if (table_var.compareTo("songs_cost_index") == 0)
-					{st.executeQuery("SELECT SongNumber, SongID, Duration, Title FROM songs_cost_index FORCE INDEX(idx_songs_cost_index_Duration) WHERE SongNumber IN (SELECT SongNumber FROM dataset.tmp) ORDER BY Duration LIMIT 20;");}
+				if (table_var.compareTo("songs_score_index") == 0)
+					{st.executeQuery("SELECT SongNumber, SongID, Duration, Title FROM songs_score_index FORCE INDEX(idx_songs_score_index_Duration) WHERE SongNumber IN (SELECT SongNumber FROM dataset.tmp) ORDER BY Duration LIMIT 20;");}
 				
 				st.executeQuery("SET GLOBAL slow_query_log='OFF';");
 				rs = st.executeQuery("SELECT * FROM mysql.slow_log where rows_sent<>0;");				
@@ -88,6 +104,8 @@ class Main {
 	}
 	
 	public static String get_table(int setSize) {
+		//return "songs_score_index";
+		
 		final int n = 10000;
 		final int b = 63;
 		final int k = 20;
@@ -96,7 +114,7 @@ class Main {
 		if ( cmp == 0 ) // Choose ID
 			return "songs_id_index";
 		else if ( cmp == 1 ) // ID is greater, choose Score
-			return "songs_cost_index";
+			return "songs_score_index";
 		else // Score is greater, choose ID
 			return "songs_id_index";
 	}
