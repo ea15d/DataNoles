@@ -7,6 +7,8 @@ import java.math.MathContext;
 class IdEquation {
  
     // Coefficient C(n, r)
+	// using source: https://programming-idioms.org/idiom/67/binomial-coefficient-n-choose-k/281/java
+
 	static BigInteger binom(int N, int K) {
 	    BigInteger ret = BigInteger.ONE;
 	    for (int k = 0; k < K; k++) {
@@ -15,6 +17,8 @@ class IdEquation {
 	    }
 	    return ret;
 	}
+	// source end
+
  
     //public static void main(String[] args)
     public IdEquation() {}
