@@ -22,7 +22,7 @@ class Main {
 			Statement st = conn.createStatement();
 	    	FileWriter f = new FileWriter("src/results.csv");
 	    	// write column headers
-	    	f.write("Runtime,Query Size\n");
+	    	f.write("Combined Index,Query Size\n");
 			
 			/*=================PROJECT_BEG==================*/	    	
 			st.executeUpdate("TRUNCATE mysql.slow_log;");
@@ -123,7 +123,7 @@ class Main {
     	int setSize;
     	FileWriter f = new FileWriter("src/estimate_id.csv");
     	// write column headers
-    	f.write("Runtime,Query Size\n");
+    	f.write("Id-ordered Index,Query Size\n");
     	for (setSize = SS_BEG; setSize <= SS_END; setSize++) {
 			f.write(IdEquation.IE(indSize, tupSize, setSize, c1, c2) + "," + setSize + "\n");
 		}
@@ -132,7 +132,7 @@ class Main {
 		
 		f = new FileWriter("src/estimate_score.csv");
     	// write header
-		f.write("Runtime,Query Size\n");
+		f.write("Score-ordered Index,Query Size\n");
 		for (setSize = SS_BEG; setSize <= SS_END; setSize++) {
 			f.write(Score_Equation.SE(indSize, tupSize, setSize, num_req, c1, c2) + "," + setSize + "\n");
 		}
